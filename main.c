@@ -13,6 +13,7 @@ int main()
         entrada = getch();
         switch(entrada){
             case '1': //abrir nueva partida
+
             case '2': break;//abrir estadisticas
         }
 
