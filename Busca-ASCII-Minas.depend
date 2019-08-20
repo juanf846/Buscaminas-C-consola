@@ -1,0 +1,19 @@
+# depslib dependency file v1.0
+1556994462 source:c:\users\juanf\documents\code blocks\unlz\2019\programacion c\busca-ascii-minas\main.c
+	<stdio.h>
+	<stdlib.h>
+	<sys/time.h>
+
+1557096398 source:c:\users\juanf\documents\code blocks\unlz\2019\programacion c\busca-ascii-minas\pruebaui.c
+	<stdio.h>
+	<stdlib.h>
+
+1556994462 source:c:\users\juanf\documents\code blocks\proyectos\buscaminas-ascii\main.c
+	<stdio.h>
+	<stdlib.h>
+	<sys/time.h>
+
+1557097214 source:c:\users\juanf\documents\code blocks\proyectos\buscaminas-ascii\pruebaui.c
+	<stdio.h>
+	<stdlib.h>
+
