@@ -21,9 +21,9 @@ void mostrarMenuPartida();
 void generar_mapa();
 void destaparCelda(int,int);
 
-int MAXIMO = 5;
+int MAXIMO = 10;
 int semilla = 0;
-int minas = 2;
+int minas = 10;
 int destapadas;
 char** mapa;
 bool** mapaOculta;
@@ -62,7 +62,7 @@ void partida_main()
     }
     struct timeval time;
     gettimeofday(&time,NULL);
-    //semilla = time.tv_sec;
+    semilla = time.tv_sec;
 
     generar_mapa();
     while(continuar){
@@ -72,8 +72,6 @@ void partida_main()
                 mostrarUI();
                 center_printf("Ingrese la fila\n");
                 center_printf("Aprete ESC para abrir el menu\n");
-                printf("%i",destapadas);
-                printf("%i",MAXIMO*MAXIMO-minas);
 
                 c = getch();
                 if(charToPosicion(c)!=-1){
