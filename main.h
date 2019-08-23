@@ -1,0 +1,7 @@
+#ifndef MAIN_H_INCLUDED
+#define MAIN_H_INCLUDED
+
+#define PANTALLA_ANCHO 118
+#define PANTALLA_ALTO 30
+
+#endif // MAIN_H_INCLUDED

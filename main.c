@@ -1,9 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <conio.h>
+#include "partida.h"
+#include "utils.h"
 
+void mostrarMenu();
 
-const char* nombreArchivoTitulo = "titulo ASCII.txt";
+const char* NOMBRE_ARCHIVO_TITULO = "titulo ASCII.txt";
+
 int main()
 {
     char entrada;
@@ -13,8 +18,11 @@ int main()
         entrada = getch();
         switch(entrada){
             case '1': //abrir nueva partida
+            partida_main();
+            break;
+            case '2': //abrir estadisticas
 
-            case '2': break;//abrir estadisticas
+            break;
         }
 
     }while(entrada!='3');
@@ -23,7 +31,7 @@ int main()
 
 void mostrarMenu(){
     FILE *fptr;
-    fptr = fopen(nombreArchivoTitulo, "r");
+    fptr = fopen(NOMBRE_ARCHIVO_TITULO, "r");
     if (fptr == NULL)
     {
         printf("Error, no se pudo abrir el archivo \"titulo ASCII.txt\"\n");
@@ -53,23 +61,15 @@ void mostrarMenu(){
     for(int i=0;i<5;i++){
         printf("\n");
     }
-    for(int i=0;i<50;i++){
-        printf(" ");
-    }
-    printf("1. Jugar\n\n");
+    center_printf("1. Jugar\n\n");
 
-    for(int i=0;i<46;i++){
-        printf(" ");
-    }
-    printf("2. Estadisticas\n\n");
+    center_printf("2. Estadisticas\n\n");
 
-    for(int i=0;i<50;i++){
-        printf(" ");
-    }
-    printf("3. Salir\n\n");
-    printf("\n\n\n");
+    center_printf("3. Salir\n\n");
+    /*printf("\n\n\n");
     for(int i=0;i<45;i++){
         printf(" ");
     }
     printf("Elija una opcion: ");
+    */
 }
