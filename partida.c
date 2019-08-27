@@ -6,6 +6,7 @@
 #include "utils.h"
 #include "partida.h"
 #include "main.h"
+#include "datos.h"
 
 #define ESTADO_ESPERANDO 0
 #define ESTADO_POSICION 1
@@ -129,7 +130,7 @@ void partida_main()
                     case '1':
                         estado = ESTADO_ESPERANDO;
                         break;
-                    case '2':
+                    //case '2':
                         //TODO guardado de partida
                     case '3':
                         return;
@@ -141,6 +142,7 @@ void partida_main()
                 printf("\n\n");
                 center_printf("PERDISTE");
                 printf("\n");
+                agregarPartidaPerdida();
                 getch();
 
                 return;
@@ -149,6 +151,7 @@ void partida_main()
                 printf("\n\n");
                 center_printf("GANASTE!!!!");
                 printf("\n");
+                agregarPartidaGanada();
                 getch();
 
                 return;
@@ -193,8 +196,8 @@ void mostrarMenuPartida(){
     }
     center_printf("1. Continuar");
     printf("\n\n");
-    center_printf("2. Guardar partida");
-    printf("\n\n");
+    //center_printf("2. Guardar partida");
+    //printf("\n\n");
     center_printf("3. Salir sin guardar");
     printf("\n\n");
 }

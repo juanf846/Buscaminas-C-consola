@@ -4,6 +4,7 @@
 #include <conio.h>
 #include "partida.h"
 #include "utils.h"
+#include "datos.h"
 
 void mostrarMenu();
 
@@ -12,6 +13,7 @@ const char* NOMBRE_ARCHIVO_TITULO = "titulo ASCII.txt";
 int main()
 {
     char entrada;
+    cargarEstadisticas();
     do{
         system("cls");
         mostrarMenu();
@@ -21,7 +23,7 @@ int main()
             partida_main();
             break;
             case '2': //abrir estadisticas
-
+            estadisticas_main();
             break;
         }
 
@@ -66,10 +68,4 @@ void mostrarMenu(){
     center_printf("2. Estadisticas\n\n");
 
     center_printf("3. Salir\n\n");
-    /*printf("\n\n\n");
-    for(int i=0;i<45;i++){
-        printf(" ");
-    }
-    printf("Elija una opcion: ");
-    */
 }

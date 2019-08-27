@@ -31,6 +31,14 @@
 		<Compiler>
 			<Add option="-Wall" />
 		</Compiler>
+		<Unit filename="datos.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="datos.h" />
+		<Unit filename="estadisticas.c">
+			<Option compilerVar="CC" />
+		</Unit>
+		<Unit filename="estadisticas.h" />
 		<Unit filename="main.c">
 			<Option compilerVar="CC" />
 		</Unit>
@@ -39,9 +47,6 @@
 			<Option compilerVar="CC" />
 		</Unit>
 		<Unit filename="partida.h" />
-		<Unit filename="pruebaUI.c">
-			<Option compilerVar="CC" />
-		</Unit>
 		<Unit filename="utils.c">
 			<Option compilerVar="CC" />
 		</Unit>
