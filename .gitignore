@@ -2,3 +2,5 @@ _etc/
 pruebaUI.c
 bin/
 obj/
+partida.txt
+estadisticas.txt

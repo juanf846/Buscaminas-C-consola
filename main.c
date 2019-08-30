@@ -5,6 +5,7 @@
 #include "partida.h"
 #include "utils.h"
 #include "datos.h"
+#include "estadisticas.h"
 
 void mostrarMenu();
 
@@ -20,14 +21,17 @@ int main()
         entrada = getch();
         switch(entrada){
             case '1': //abrir nueva partida
-            partida_main();
-            break;
-            case '2': //abrir estadisticas
-            estadisticas_main();
-            break;
+                partida_main(false);
+                break;
+            case '2':
+                partida_main(true);
+                break;
+            case '3': //abrir estadisticas
+                estadisticas_main();
+                break;
         }
 
-    }while(entrada!='3');
+    }while(entrada!='q');
     return 0;
 }
 
@@ -37,6 +41,7 @@ void mostrarMenu(){
     if (fptr == NULL)
     {
         printf("Error, no se pudo abrir el archivo \"titulo ASCII.txt\"\n");
+        system("pause");
         exit(-404);
     }
     printf("\n\n\n\n\n");
@@ -65,7 +70,9 @@ void mostrarMenu(){
     }
     center_printf("1. Jugar\n\n");
 
-    center_printf("2. Estadisticas\n\n");
+    center_printf("2. Cargar partida\n\n");
 
-    center_printf("3. Salir\n\n");
+    center_printf("3. Estadisticas\n\n");
+
+    center_printf("Q. Salir\n\n");
 }

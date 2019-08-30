@@ -19,12 +19,12 @@
 int charToPosicion(char);
 void mostrarUI();
 void mostrarMenuPartida();
-void generar_mapa();
+void generar_mapa(bool);
 void destaparCelda(int,int);
 
-int MAXIMO = 10;
-int semilla = 0;
-int minas = 10;
+int maximo;
+int semilla;
+int minas ;
 int destapadas;
 char** mapa;
 bool** mapaOculta;
@@ -35,37 +35,43 @@ char antChar;
 ESPERANDO(0) = Se puede ingresar posicion o ir al menu
 POSICION(1) = Se ingreso el primer caracter de la posicion
 MENU(2) = Se abrio el menu
-TERMINADO(3) = El jugador perdió o ganó
+PERDIO(3) = El jugador perdió
+GANO(4) = El jugador ganó
 */
-int charToPosicion(char c){
-    int a = -1;
-    if((c >= '0' && c <= '9')){
-        a = c-'0';
-    }else if((c >= 'a' && c <= 'k')){
-        a = c-'a'+10;
-    }
-    if(a>=MAXIMO){
-        a = -1;
-    }
-    return a;
-}
-void partida_main()
+void partida_main(bool cPartida)
 {
+    destapadas = 0;
+    if(!cPartida){
+        struct timeval time;
+        gettimeofday(&time,NULL);
+        semilla = time.tv_sec;
+        maximo = 10;
+        minas = 10;
+
+        mapa = malloc(sizeof(char*)*maximo);
+        mapaOculta = malloc(sizeof(bool*)*maximo);
+        for(int i=0;i<maximo;i++){
+            mapa[i] = malloc(sizeof(char)*maximo);
+            mapaOculta[i] = malloc(sizeof(bool)*maximo);
+        }
+    }else{
+        if(cargarPartidaMetadata(&semilla,&minas,&maximo)){
+            mapa = malloc(sizeof(char*)*maximo);
+            mapaOculta = malloc(sizeof(bool*)*maximo);
+            for(int i=0;i<maximo;i++){
+                mapa[i] = malloc(sizeof(char)*maximo);
+                mapaOculta[i] = malloc(sizeof(bool)*maximo);
+            }
+            cargarPartidaMapa(mapaOculta,maximo,&destapadas);
+        }else{
+            return;
+        }
+    }
     estado = ESTADO_ESPERANDO;
     antChar = 0;
     continuar = true;
-    destapadas = 0;
-    mapa = malloc(sizeof(char*)*MAXIMO);
-    mapaOculta = malloc(sizeof(bool*)*MAXIMO);
-    for(int i=0;i<MAXIMO;i++){
-        mapa[i] = malloc(sizeof(char)*MAXIMO);
-        mapaOculta[i] = malloc(sizeof(bool)*MAXIMO);
-    }
-    struct timeval time;
-    gettimeofday(&time,NULL);
-    semilla = time.tv_sec;
 
-    generar_mapa();
+    generar_mapa(!cPartida);
     while(continuar){
         char c;
         switch(estado){
@@ -74,6 +80,12 @@ void partida_main()
                 center_printf("Ingrese la fila\n");
                 center_printf("Aprete ESC para abrir el menu\n");
 
+                printf("DEBUG:\n");
+                printf("Maximo: %i\n",maximo);
+                printf("Minas: %i\n",minas);
+                printf("Destapadas: %i\n",destapadas);
+
+
                 c = getch();
                 if(charToPosicion(c)!=-1){
                     antChar = c;
@@ -81,7 +93,6 @@ void partida_main()
                 }else if(c == 27){
                     estado = ESTADO_MENU;
                 }else{
-                    //system("CLS");
                     center_printf("\nERROR: Valor no valido\n");
                     system("PAUSE");
                 }
@@ -100,14 +111,14 @@ void partida_main()
                     if(mapa[fila][columna]==9){
                         //perdió
                         mapa[fila][columna] = 10;
-                        for(int i=0;i<MAXIMO;i++)
-                            for(int j=0;j<MAXIMO;j++)
+                        for(int i=0;i<maximo;i++)
+                            for(int j=0;j<maximo;j++)
                                 if(mapa[i][j]==9)
                                     mapaOculta[i][j]=false;
                         estado = ESTADO_PERDIO;
                         break;
                     }
-                    if(destapadas == MAXIMO*MAXIMO-minas){
+                    if(destapadas == maximo*maximo-minas){
                         //Ganó
                         printf("gano");
                         estado = ESTADO_GANO;
@@ -130,8 +141,10 @@ void partida_main()
                     case '1':
                         estado = ESTADO_ESPERANDO;
                         break;
-                    //case '2':
-                        //TODO guardado de partida
+                    case '2':
+                        guardarPartida(semilla,minas,maximo,mapaOculta);
+                        estado = ESTADO_ESPERANDO;
+                        break;
                     case '3':
                         return;
                 }
@@ -161,13 +174,14 @@ void partida_main()
     return;
 }
 
-void generar_mapa(){
+void generar_mapa(bool mapaOcultaInit){
     srand(semilla);
     //pone todo la matriz a 0
-    for(int i=0;i<MAXIMO;i++){
-        for(int j=0;j<MAXIMO;j++){
+    for(int i=0;i<maximo;i++){
+        for(int j=0;j<maximo;j++){
             mapa[i][j] = 0;
-            mapaOculta[i][j] = true;
+            if(mapaOcultaInit)
+                mapaOculta[i][j] = true;
         }
     }
     //Agrega las minas
@@ -175,14 +189,14 @@ void generar_mapa(){
         int x;
         int y;
         do{
-            x = rand() % MAXIMO;
-            y = rand() % MAXIMO;
+            x = rand() % maximo;
+            y = rand() % maximo;
         }while(mapa[x][y]==9);
         mapa[x][y] = 9;
         //agrega 1 a todas las celdas pegadas
         for(int x1 = -1; x1 < 2;x1++){
             for(int y1 = -1; y1 < 2;y1++){
-                if(x+x1>-1 && x+x1<MAXIMO && y+y1>-1 && y+y1<MAXIMO && mapa[x+x1][y+y1] != 9){
+                if(x+x1>-1 && x+x1<maximo && y+y1>-1 && y+y1<maximo && mapa[x+x1][y+y1] != 9){
                     mapa[x+x1][y+y1] += 1;
                 }
             }
@@ -196,8 +210,8 @@ void mostrarMenuPartida(){
     }
     center_printf("1. Continuar");
     printf("\n\n");
-    //center_printf("2. Guardar partida");
-    //printf("\n\n");
+    center_printf("2. Guardar partida");
+    printf("\n\n");
     center_printf("3. Salir sin guardar");
     printf("\n\n");
 }
@@ -205,11 +219,11 @@ void mostrarUI(){
     //Limpia pantalla
     system("cls");
     //Imprime \n para centrar el contenido
-    for(int i=0;i<(PANTALLA_ALTO/3)-(MAXIMO/2);i++){
+    for(int i=0;i<(PANTALLA_ALTO/3)-(maximo/2);i++){
         printf("\n");
     }
     //Calcula el margen izquierdo para que este centrado
-    int margenIzquierdo = (PANTALLA_ANCHO/2)-(MAXIMO);
+    int margenIzquierdo = (PANTALLA_ANCHO/2)-(maximo);
     //Regla de DEBUG
     //reglaHorizontal();
 
@@ -218,7 +232,7 @@ void mostrarUI(){
         printf(" ");
     }
     //Numeros orientativos horizontales
-    for(int i=0;i<MAXIMO;i++){
+    for(int i=0;i<maximo;i++){
         if(i<10) printf("%i ",i);
         else printf("%c ",'A'+i-10);
     }
@@ -226,7 +240,7 @@ void mostrarUI(){
     printf("\n");
     //Datos de que fila se selecciono
     int seleccionado = charToPosicion(antChar);
-    for(int i=0;i<MAXIMO;i++){
+    for(int i=0;i<maximo;i++){
         //Margen izquierdo del tablero
         for(int j=0;j<margenIzquierdo-2-(seleccionado==i);j++){
             printf(" ");
@@ -237,7 +251,7 @@ void mostrarUI(){
         else printf("%c ",'A'+i-10);
 
         //Tablero
-        for(int j=0;j<MAXIMO;j++){
+        for(int j=0;j<maximo;j++){
             if(mapaOculta[i][j]==true){
                 printf("%c",CARACTER_CUADRADO);
             }else{
@@ -260,12 +274,25 @@ void destaparCelda(int f,int c){
         mapaOculta[f][c]=false;
         destapadas++;
         if(mapa[f][c]==0){
-            for(int i = max(0,f-1);i<=min(MAXIMO-1,f+1);i++)
-                for(int j = max(0,c-1);j<=min(MAXIMO-1,c+1);j++)
+            for(int i = max(0,f-1);i<=min(maximo-1,f+1);i++)
+                for(int j = max(0,c-1);j<=min(maximo-1,c+1);j++)
                     if(mapa[i][j]!=9)
                         destaparCelda(i,j);
 
         }
 
     }
+}
+
+int charToPosicion(char c){
+    int a = -1;
+    if((c >= '0' && c <= '9')){
+        a = c-'0';
+    }else if((c >= 'a' && c <= 'k')){
+        a = c-'a'+10;
+    }
+    if(a>=maximo){
+        a = -1;
+    }
+    return a;
 }
