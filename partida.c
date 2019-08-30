@@ -24,6 +24,7 @@ GANO(4) = El jugador ganó
 #define CARACTER_CUADRADO 254
 
 void mostrarUI();
+bool mostrarDificultades();
 
 void estadoEsperando();
 void estadoPosicion();
@@ -54,11 +55,12 @@ void partida_main(bool cPartida)
     destapadas = 0;
     if(!cPartida){
         //nueva partida
+        if(!mostrarDificultades()){
+            return;
+        }
         struct timeval time;
         gettimeofday(&time,NULL);
         semilla = time.tv_sec;
-        maximo = 10;
-        minas = 10;
 
         mapa = malloc(sizeof(char*)*maximo);
         mapaOculta = malloc(sizeof(bool*)*maximo);
@@ -187,6 +189,7 @@ void estadoPosicion(){
 */
 void estadoMenu(){
     system("CLS");
+    //Imprime \n para centrar el contenido
     for(int i=0;i<PANTALLA_ALTO/2-9/2;i++){
         printf("\n");
     }
@@ -299,6 +302,47 @@ void mostrarUI(){
         printf("\n");
     }
     printf("\n");
+}
+
+bool mostrarDificultades(){
+    system("cls");
+    //Imprime \n para centrar el contenido
+    for(int i=0;i<PANTALLA_ALTO/2-9/2;i++){
+        printf("\n");
+    }
+    center_printf("1. Facil (7x7, 10 minas)");
+    printf("\n\n");
+    center_printf("2. Medio (12x12, 25 minas");
+    printf("\n\n");
+    center_printf("3. Dificil (15x15, 50 minas)");
+    printf("\n\n");
+    center_printf("0. Cancelar");
+    printf("\n\n");
+
+    bool valido;
+    do{
+        valido = true;
+        c = getch();
+        switch(c){
+            case '1':
+                maximo = 7;
+                minas = 10;
+                break;
+            case '2':
+                maximo = 12;
+                minas = 25;
+                break;
+            case '3':
+                maximo = 15;
+                minas = 50;
+                break;
+            case '0':
+                return false;
+            default:
+                valido = false;
+        }
+    }while(!valido);
+    return true;
 }
 
 /** Funcion para destapar una celda. Si la celda es un 0, destapa tambien las celdas pegadas (recursivamente)
