@@ -8,7 +8,7 @@
 	<stdio.h>
 	<stdlib.h>
 
-1567125040 source:c:\users\juanf\documents\code blocks\proyectos\buscaminas-ascii\main.c
+1567173102 source:c:\users\juanf\documents\code blocks\proyectos\buscaminas-ascii\main.c
 	<stdio.h>
 	<stdlib.h>
 	<stdbool.h>
@@ -22,7 +22,7 @@
 	<stdio.h>
 	<stdlib.h>
 
-1567172547 source:c:\users\juanf\documents\code blocks\proyectos\buscaminas-ascii\partida.c
+1567173102 source:c:\users\juanf\documents\code blocks\proyectos\buscaminas-ascii\partida.c
 	<stdio.h>
 	<stdlib.h>
 	<stdbool.h>
@@ -33,7 +33,7 @@
 	"main.h"
 	"datos.h"
 
-1566949675 c:\users\juanf\documents\code blocks\proyectos\buscaminas-ascii\partida.h
+1567173102 c:\users\juanf\documents\code blocks\proyectos\buscaminas-ascii\partida.h
 
 1566585772 c:\users\juanf\documents\code blocks\proyectos\buscaminas-ascii\main.h
 
@@ -44,13 +44,13 @@
 
 1566585772 c:\users\juanf\documents\code blocks\proyectos\buscaminas-ascii\utils.h
 
-1567172552 source:c:\users\juanf\documents\code blocks\proyectos\buscaminas-ascii\datos.c
+1567173102 source:c:\users\juanf\documents\code blocks\proyectos\buscaminas-ascii\datos.c
 	<stdio.h>
 	<stdlib.h>
 	<stdbool.h>
 	"datos.h"
 
-1567172447 c:\users\juanf\documents\code blocks\proyectos\buscaminas-ascii\datos.h
+1567173102 c:\users\juanf\documents\code blocks\proyectos\buscaminas-ascii\datos.h
 
 1566947595 source:c:\users\juanf\documents\code blocks\proyectos\buscaminas-ascii\estadisticas.c
 	<stdio.h>

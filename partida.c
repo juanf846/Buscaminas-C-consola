@@ -8,6 +8,13 @@
 #include "main.h"
 #include "datos.h"
 
+/*Estados:
+ESPERANDO(0) = Se puede ingresar posicion o ir al menu
+POSICION(1) = Se ingreso el primer caracter de la posicion
+MENU(2) = Se abrio el menu
+PERDIO(3) = El jugador perdió
+GANO(4) = El jugador ganó
+*/
 #define ESTADO_ESPERANDO 0
 #define ESTADO_POSICION 1
 #define ESTADO_MENU 2
@@ -16,32 +23,37 @@
 
 #define CARACTER_CUADRADO 254
 
-int charToPosicion(char);
 void mostrarUI();
-void mostrarMenuPartida();
+
+void estadoEsperando();
+void estadoPosicion();
+void estadoMenu();
+
 void generar_mapa(bool);
+
 void destaparCelda(int,int);
+int charToPosicion(char);
 
 int maximo;
 int semilla;
-int minas ;
+int minas;
 int destapadas;
 char** mapa;
 bool** mapaOculta;
 bool continuar;
 char estado;
 char antChar;
-/*Estados:
-ESPERANDO(0) = Se puede ingresar posicion o ir al menu
-POSICION(1) = Se ingreso el primer caracter de la posicion
-MENU(2) = Se abrio el menu
-PERDIO(3) = El jugador perdió
-GANO(4) = El jugador ganó
-*/
+char c;
+
+/** Funcion principal de la pantalla partida
+ *  Parametros:
+ *  *cPartida: Indica si se tiene que cargar la partida o iniciar una nueva
+ */
 void partida_main(bool cPartida)
 {
     destapadas = 0;
     if(!cPartida){
+        //nueva partida
         struct timeval time;
         gettimeofday(&time,NULL);
         semilla = time.tv_sec;
@@ -55,6 +67,7 @@ void partida_main(bool cPartida)
             mapaOculta[i] = malloc(sizeof(bool)*maximo);
         }
     }else{
+        //cargar partida
         if(cargarPartidaMetadata(&semilla,&minas,&maximo)){
             mapa = malloc(sizeof(char*)*maximo);
             mapaOculta = malloc(sizeof(bool*)*maximo);
@@ -73,83 +86,16 @@ void partida_main(bool cPartida)
 
     generar_mapa(!cPartida);
     while(continuar){
-        char c;
         switch(estado){
             case ESTADO_ESPERANDO:
-                mostrarUI();
-                center_printf("Ingrese la fila\n");
-                center_printf("Aprete ESC para abrir el menu\n");
-
-                printf("DEBUG:\n");
-                printf("Maximo: %i\n",maximo);
-                printf("Minas: %i\n",minas);
-                printf("Destapadas: %i\n",destapadas);
-
-
-                c = getch();
-                if(charToPosicion(c)!=-1){
-                    antChar = c;
-                    estado = ESTADO_POSICION;
-                }else if(c == 27){
-                    estado = ESTADO_MENU;
-                }else{
-                    center_printf("\nERROR: Valor no valido\n");
-                    system("PAUSE");
-                }
+                estadoEsperando();
                 break;
             case ESTADO_POSICION:
-                mostrarUI();
-                center_printf("Ingrese la columna:\n");
-                center_printf("Aprete ESC para cancelar");
-                c = getch();
-                if(charToPosicion(c)!=-1){
-                    //Funcion destapar
-                    int fila = charToPosicion(antChar);
-                    int columna = charToPosicion(c);
-                    destaparCelda(fila,columna);
-                    antChar = 0;
-                    if(mapa[fila][columna]==9){
-                        //perdió
-                        mapa[fila][columna] = 10;
-                        for(int i=0;i<maximo;i++)
-                            for(int j=0;j<maximo;j++)
-                                if(mapa[i][j]==9)
-                                    mapaOculta[i][j]=false;
-                        estado = ESTADO_PERDIO;
-                        break;
-                    }
-                    if(destapadas == maximo*maximo-minas){
-                        //Ganó
-                        printf("gano");
-                        estado = ESTADO_GANO;
-                        break;
-                    }
-                    estado = ESTADO_ESPERANDO;
-                }else if(c == 27){
-                    antChar = 0;
-                    estado = ESTADO_ESPERANDO;
-                }else{
-                    system("CLS");
-                    center_printf("\nERROR: Valor no valido\n");
-                    system("PAUSE");
-                }
+                estadoPosicion();
                 break;
             case ESTADO_MENU:
-                mostrarMenuPartida();
-                c = getch();
-                switch(c){
-                    case '1':
-                        estado = ESTADO_ESPERANDO;
-                        break;
-                    case '2':
-                        guardarPartida(semilla,minas,maximo,mapaOculta);
-                        estado = ESTADO_ESPERANDO;
-                        break;
-                    case '3':
-                        return;
-                }
+                estadoMenu();
                 break;
-
             case ESTADO_PERDIO:
                 mostrarUI();
                 printf("\n\n");
@@ -157,7 +103,6 @@ void partida_main(bool cPartida)
                 printf("\n");
                 agregarPartidaPerdida();
                 getch();
-
                 return;
             case ESTADO_GANO:
                 mostrarUI();
@@ -166,14 +111,108 @@ void partida_main(bool cPartida)
                 printf("\n");
                 agregarPartidaGanada();
                 getch();
-
                 return;
         }
     }
-    system("pause");
     return;
 }
 
+/** Esta funcion se llama para mostrar la interfaz y recibir el primer caracter. ESC abre menú
+ */
+void estadoEsperando(){
+    mostrarUI();
+    center_printf("Ingrese la fila\n");
+    center_printf("Aprete ESC para abrir el menu\n");
+
+    /*
+    printf("DEBUG:\n");
+    printf("Maximo: %i\n",maximo);
+    printf("Minas: %i\n",minas);
+    printf("Destapadas: %i\n",destapadas);
+    */
+
+    c = getch();
+    if(charToPosicion(c)!=-1){
+        antChar = c;
+        estado = ESTADO_POSICION;
+    }else if(c == 27){
+        estado = ESTADO_MENU;
+    }else{
+        center_printf("\nERROR: Valor no valido\n");
+        system("PAUSE");
+    }
+}
+
+/** Esta funcion se llama para mostrar la interfaz y recibir el segundo caracter. ESC cancela y vuelve a estadoEsperando
+ */
+void estadoPosicion(){
+    mostrarUI();
+    center_printf("Ingrese la columna:\n");
+    center_printf("Aprete ESC para cancelar");
+    c = getch();
+    if(charToPosicion(c)!=-1){
+        //Funcion destapar
+        int fila = charToPosicion(antChar);
+        int columna = charToPosicion(c);
+        destaparCelda(fila,columna);
+        antChar = 0;
+        if(mapa[fila][columna]==9){
+            //perdió
+            mapa[fila][columna] = 10;
+            for(int i=0;i<maximo;i++)
+                for(int j=0;j<maximo;j++)
+                    if(mapa[i][j]==9)
+                        mapaOculta[i][j]=false;
+            estado = ESTADO_PERDIO;
+            return;
+        }
+        if(destapadas == maximo*maximo-minas){
+            //Ganó
+            printf("gano");
+            estado = ESTADO_GANO;
+            return;
+        }
+        estado = ESTADO_ESPERANDO;
+    }else if(c == 27){
+        antChar = 0;
+        estado = ESTADO_ESPERANDO;
+    }else{
+        system("CLS");
+        center_printf("\nERROR: Valor no valido\n");
+        system("PAUSE");
+    }
+}
+
+/** Menu in-game
+*/
+void estadoMenu(){
+    system("CLS");
+    for(int i=0;i<PANTALLA_ALTO/2-9/2;i++){
+        printf("\n");
+    }
+    center_printf("1. Continuar");
+    printf("\n\n");
+    center_printf("2. Guardar partida");
+    printf("\n\n");
+    center_printf("3. Salir sin guardar");
+    printf("\n\n");
+    c = getch();
+    switch(c){
+        case '1':
+            estado = ESTADO_ESPERANDO;
+            return;
+        case '2':
+            guardarPartida(semilla,minas,maximo,mapaOculta);
+            estado = ESTADO_ESPERANDO;
+            return;
+        case '3':
+            continuar = false;
+            return;
+    }
+}
+/** Genera el mapa segun la semilla. Si mapaOcultaInit es falso, no inicializa la matriz de celdas ocultas
+ * (porque esta cargando una partida)
+ */
 void generar_mapa(bool mapaOcultaInit){
     srand(semilla);
     //pone todo la matriz a 0
@@ -203,18 +242,9 @@ void generar_mapa(bool mapaOcultaInit){
         }
     }
 }
-void mostrarMenuPartida(){
-    system("CLS");
-    for(int i=0;i<PANTALLA_ALTO/2-9/2;i++){
-        printf("\n");
-    }
-    center_printf("1. Continuar");
-    printf("\n\n");
-    center_printf("2. Guardar partida");
-    printf("\n\n");
-    center_printf("3. Salir sin guardar");
-    printf("\n\n");
-}
+
+/** Muestra el tablero
+ */
 void mostrarUI(){
     //Limpia pantalla
     system("cls");
@@ -259,6 +289,8 @@ void mostrarUI(){
                     printf("*");
                 else if(mapa[i][j]==10)
                     printf("+");
+                else if(mapa[i][j]==0)
+                    printf(" ");
                 else
                     printf("%c",mapa[i][j]+'0');
             }
@@ -269,6 +301,8 @@ void mostrarUI(){
     printf("\n");
 }
 
+/** Funcion para destapar una celda. Si la celda es un 0, destapa tambien las celdas pegadas (recursivamente)
+ */
 void destaparCelda(int f,int c){
     if(mapaOculta[f][c]){
         mapaOculta[f][c]=false;
@@ -283,7 +317,9 @@ void destaparCelda(int f,int c){
 
     }
 }
-
+/**
+ * Convierte el caracter ingresado a una posicion de la matriz. Recibe de 0 a 9 y de A(10) a K(19). Devuelve -1 si es invalido.
+ */
 int charToPosicion(char c){
     int a = -1;
     if((c >= '0' && c <= '9')){
